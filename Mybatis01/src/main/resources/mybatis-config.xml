@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+  <!--用来加载外部的properties文件-->
+  <properties resource="db.properties"></properties>
+  <!--驼峰命名规则-->
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+  </settings>
+
+  <!--在映射文件中JavaBean只用写类名就可以了  包名省略 不区分大小写-->
+  <typeAliases>
+    <package name="com.example.bean"/>
+  </typeAliases>
+
+  <!--类型处理器-->
+  <typeHandlers></typeHandlers>
+  <!--可以配置多个数据库环境-->
+  <environments default="development">
+    <!--environment配置一个数据库的环境-->
+    <environment id="development">
+      <!--使用JDBC事务管理器-->
+      <transactionManager type="JDBC"/>
+      <!--POOLED 说明他启用连接池-->
+      <dataSource type="POOLED">
+        <!--driver url username password  不能随便写 -->
+        <property name="driver" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+      </dataSource>
+    </environment>
+  </environments>
+
+  <!--mappers 定义映射文件 一张表对应一个映射文件-->
+  <mappers>
+    <mapper resource="com/example/mapper/UserMapper.xml"/>
+    <mapper resource="com/example/mapper/StudentMapper.xml"></mapper>
+  </mappers>
+</configuration>
