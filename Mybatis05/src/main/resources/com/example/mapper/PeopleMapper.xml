@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.PeopleMapper">
+
+    <insert id="insertMany">
+        insert into people_hk(name,pwd,sex) values
+                <foreach collection="plist" item="peo" separator=",">
+                    (#{peo.name},#{peo.pwd},#{peo.sex})
+                </foreach>
+    </insert>
+
+    <select id="getAll" resultType="People">
+        select * from people_hk
+    </select>
+
+</mapper>
