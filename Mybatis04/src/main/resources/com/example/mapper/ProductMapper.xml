@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ProductMapper">
+
+   <!--<select id="getBySome" resultType="Product">
+       select * from product where name=#{name} and price=#{price} and img=#{img}
+   </select>-->
+
+    <!--<select id="getBySome" resultType="Product">
+        select * from product where 1=1
+        <if test="name!=null and name !=''">
+            and name=#{name}
+        </if>
+        <if test="price!=null and price !=''">
+            and price=#{price}
+        </if>
+        <if test="img!=null and img !=''">
+            and img=#{img}
+        </if>
+    </select>-->
+
+    <!--如果碰到了where关键字-->
+    <select id="getBySome" resultType="Product">
+        select * from product
+        <where>
+            <if test="name!=null and name !=''">
+                and name=#{name}
+            </if>
+            <if test="price!=null and price !=''">
+                and price=#{price}
+            </if>
+            <if test="img!=null and img !=''">
+                and img=#{img}
+            </if>
+        </where>
+    </select>
+
+    <!--<update id="update">
+        update product set name=#{name},price=#{price},img=#{img} where id=#{id}
+    </update>-->
+    <!--如果sql碰到set标签 会自动添加set关键字 如果最后多了逗号，会自动去除-->
+    <update id="update">
+        update product
+            <set>
+                <if test="name!=null and name !=''">
+                    name=#{name},
+                </if>
+                <if test="price!=null and price !=''">
+                     price=#{price},
+                </if>
+                <if test="img!=null and img !=''">
+                     img=#{img},
+                </if>
+            </set>
+            where id = #{id}
+    </update>
+
+    <select id="idByOfOne" resultType="Product">
+        select * from product where
+        <choose>
+            <when test="name!=null and name !=''">
+                name=#{name}
+            </when>
+            <when test="price!=null and price !=''">
+                price=#{price}
+            </when>
+            <when test="img!=null and img !=''">
+                img=#{img}
+            </when>
+            <otherwise>
+                1=1
+            </otherwise>
+        </choose>
+
+    </select>
+
+    <select id="getByIds" resultType="Product">
+        select * from product where id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+    </select>
+
+
+    <select id="getByNames" resultType="Product">
+        select * from product where name in
+        <foreach collection="names" item="name" open="(" close=")" separator=",">
+            #{name}
+        </foreach>
+    </select>
+
+    <select id="getByMap" resultType="Product">
+        select * from product where name in(
+            <foreach collection="maps" index="k" item="v">
+                #{k},#{v}
+            </foreach>
+        )
+    </select>
+    <insert id="insertOne">
+        insert into  product(name,price,img) values (#{name},#{price},#{img})
+    </insert>
+
+    <insert id="insertMany">
+        insert into product(name,price,img) values
+            <foreach collection="plist" item="pro" separator=",">
+                (#{pro.name},#{pro.price},#{pro.img})
+            </foreach>
+    </insert>
+
+    <select id="getAll" resultType="Product">
+        select * from product
+    </select>
+    <select id="getById" resultType="Product">
+        select * from product where id = #{id}
+    </select>
+    <delete id="deleteById">
+        delete from product where id =#{id}
+    </delete>
+</mapper>
