@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.PeopleMapper">
+
+    <!--<resultMap id="peopleMap" type="People">
+        <id property="pid" column="id"></id>
+        <result property="pname" column="name"></result>
+        <result property="password" column="password"></result>
+        <result property="pstatus" column="status"></result>
+    </resultMap>
+    <select id="getAll" resultMap="peopleMap">
+        select * from people
+    </select>-->
+
+   <!-- <select id="getAll" resultType="People">
+        select id pid,name pname,password,status pstatus from people
+    </select>-->
+
+    <resultMap id="peo_car" type="People">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="password" column="password"></result>
+        <result property="status" column="status"></result>
+        <collection property="clist" ofType="Car">
+            <id property="carid" column="carid"></id>
+            <result property="name" column="cname"></result>
+            <result property="color" column="color"></result>
+            <result property="pid" column="pid"></result>
+        </collection>
+    </resultMap>
+
+    <select id="getAll" resultMap="peo_car">
+        select p.*,c.carid,c.name cname,c.color, c.pid from people p left join car c on p.id=c.pid
+    </select>
+
+    <select id="getAll2" resultType="people">
+        select * from people
+    </select>
+
+
+</mapper>

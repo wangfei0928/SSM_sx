@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ProductMapper">
+
+    <select id="findAll" resultType="product">
+        select * from product
+    </select>
+    <select id="finById" resultType="product">
+        select * from product where id = #{id}
+    </select>
+    <select id="findByName" resultType="product">
+        select * from product where name = '${name}'    /*$为字符串拼接，一定要加''*/
+    </select>
+<!--
+    如果传递过来的是多个参数，需要指定好参数名称，或者按照索引顺序来
+-->
+    <select id="findByNameAndPrice" resultType="product">
+        select * from product where name=#{name} and price=#{price}
+    </select>
+
+    <select id="findAllByOrder" resultType="product">
+        select * from product order by ${order} desc
+    </select>
+
+    <select id="getBySome" resultType="product">
+        select * from product where name = #{name} and price = ${price} and img = #{img}
+    </select>
+
+
+
+    <insert id="insertParam">
+        insert into product(name,price,img) values (#{name},#{price},#{img})
+    </insert>
+
+    <insert id="insertPro" useGeneratedKeys="true" keyProperty="id">
+        insert into product(name,price,img) values (#{name},#{price},#{img})
+    </insert>
+
+    <update id="update">
+        update  product set name=#{name},price=#{price},img=#{img} where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from product where id=#{id}
+    </delete>
+</mapper>
