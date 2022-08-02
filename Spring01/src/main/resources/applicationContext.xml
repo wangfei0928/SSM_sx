@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+<!--    <bean id="stu" class="com.example.bean.Student"></bean>-->
+    <bean id="studentFactory" class="com.example.factory.StudentFactory" lazy-init="false" factory-method="creatStu" scope="singleton">
+        <property name="id" value="001"></property>
+        <property name="name" value="张三"></property>
+        <property name="sex" value="男"></property>
+        <property name="hobby">
+            <list>
+                <value>篮球</value>
+                <value>足球</value>
+            </list>
+        </property>
+
+        <property name="scores">
+           <array>
+               <value>99</value>
+               <value>89</value>
+           </array>
+        </property>
+
+        <property name="maps">
+            <map>
+                <entry key="1" value="hello"></entry>
+                <entry key="2" value="world"></entry>
+            </map>
+        </property>
+
+        <property name="teacher" ref="tea"></property>
+    </bean>
+
+    <bean id="tea" class="com.example.bean.Teacher"></bean>
+    <bean id="student" class="com.example.bean.Student">
+        <constructor-arg name="id" value="001"></constructor-arg>
+        <constructor-arg name="name" value="李四"></constructor-arg>
+        <constructor-arg name="sex" value="女"></constructor-arg>
+    </bean>
+
+    <!--c是constructor的简写-->
+    <bean id="stu3" class="com.example.bean.Student" c:id="111" c:sex="男" c:name="李逵" c:teacher-ref="tea2"/><!--必须对应带参构造器-->
+
+<!--    <bean id="stu3" class="com.example.bean.Student" c:id="15" c:name="李逵" c:sex="男" c:teacher-ref="tea2"></bean>-->
+    <bean id="tea2" class="com.example.bean.Teacher" ></bean>
+
+
+    <bean id="stu4" class="com.example.bean.Student" p:id="111" p:sex="男" p:name="李逵" p:teacher-ref="tea2"/>
+</beans>
