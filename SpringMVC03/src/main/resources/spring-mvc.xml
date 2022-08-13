@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <context:component-scan base-package="com.example.controller"></context:component-scan>
+
+
+    <!--视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+
+    <!--视图控制器-->
+    <mvc:view-controller path="/" view-name="hello"></mvc:view-controller><!--默认欢迎界面-->
+    <mvc:annotation-driven/>  <!--显示开启springMVC注解支持-->
+
+    <!--静态资源处理  两种方式-->
+<!--    <mvc:resources mapping="/static/**" location="/static/"></mvc:resources>-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+
+</beans>
