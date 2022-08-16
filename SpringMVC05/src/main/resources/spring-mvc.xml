@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+        <!-- 设置RestTemplate请求编码和支持的文档类型 -->
+        <property name="messageConverters">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json</value>
+                        <value>text/html</value>
+                    </list>
+                </property>
+                <property name="defaultCharset" value="UTF-8"/>
+            </bean>
+        </property>
+    </bean>
+
+    <context:component-scan base-package="com.example.controller"/>
+
+    <!-- 配置基于apache fileupload的通用文件上传器（注意：id属性不可省略） -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> <!-- 指定文件上传编码 -->
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/css/**"/>
+            <mvc:exclude-mapping path="/js/**"/>
+            <mvc:exclude-mapping path="/img/**"/>
+            <mvc:exclude-mapping path="/login"/>
+            <bean class="com.example.interceptor.MyInterceptor"></bean>
+        </mvc:interceptor>
+
+<!--        <bean class="com.example.interceptor.MyInterceptor"></bean>-->
+    </mvc:interceptors>
+
+    <!--视图控制器-->
+    <!--<mvc:view-controller path="/" view-name="hello"/>-->
+
+    <!--显式开启springMVC-->
+    <mvc:annotation-driven/>
+
+    <!--静态资源处理-->
+    <mvc:default-servlet-handler/>
+    <!--<mvc:resources mapping="/static/**" location="/static/"/>-->
+
+    <!--视图解析器（不能使用注解替代）-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+</beans>
