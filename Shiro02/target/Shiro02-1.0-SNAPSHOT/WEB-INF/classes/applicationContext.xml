@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+        <!--配置自定义的Realm-->
+        <bean id="myRealm1" class="com.example.realm.MyRealm1"></bean>
+<!--        <bean id="myRealm2" class="com.example.realm.MyRealm2"></bean>-->
+
+        <!--指定多Realm认证策略-->
+<!--        <bean id="modularRealmAuthenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">-->
+<!--            <property name="authenticationStrategy">-->
+<!--&lt;!&ndash;                <bean class="org.apache.shiro.authc.pam.FirstSuccessfulStrategy">&ndash;&gt;-->
+<!--&lt;!&ndash;                    &lt;!&ndash; 一定要设置，否则默认是false，不会停止继续查看后面的Realm &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                    <property name="stopAfterFirstSuccess" value="true" />&ndash;&gt;-->
+<!--&lt;!&ndash;                </bean>&ndash;&gt;-->
+<!--                <bean class="org.apache.shiro.authc.pam.AllSuccessfulStrategy"></bean>-->
+<!--            </property>-->
+<!--        </bean>-->
+
+         <!-- 配置安全管理器-->
+        <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+            <!--注入自定义的Realm-->
+            <property name="realm" ref="myRealm1"/>
+<!--            <property name="authenticator" ref="modularRealmAuthenticator" />-->
+<!--            &lt;!&ndash;配置多个realm&ndash;&gt;-->
+<!--            <property name="realms">-->
+<!--                <list>-->
+<!--                    <ref bean="myRealm1"/>-->
+<!--                    <ref bean="myRealm2"/>-->
+<!--                </list>-->
+<!--            </property>-->
+        </bean>
+
+        <!-- 配置 Shiro Filter -->
+        <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+            <!-- 安全管理器 -->
+            <property name="securityManager" ref="securityManager"/>
+            <!-- 默认的登陆访问url -->
+            <property name="loginUrl" value="/login.jsp"/>
+            <!-- 登陆成功后跳转的url -->
+<!--            <property name="successUrl" value="/index"/>-->
+            <!-- 没有权限跳转的url -->
+            <property name="unauthorizedUrl" value="/unauth.jsp"/>
+            <property name="filterChainDefinitions">
+                <value>
+                    <!--
+                    anon 不需要认证
+                    authc 需要认证
+                    user 认证通过或RememberMe登录的都可以
+                     /** 要放在最后
+                    -->
+                    /static/** = anon
+                    /login = anon
+                    /add = roles[admin]
+                    /edit = roles[user]
+                    /** = user
+                </value>
+            </property>
+        </bean>
+</beans>
