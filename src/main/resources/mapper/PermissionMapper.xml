@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mapper.PermissionMapper">
+
+    <select id="getByRoleIds" resultType="Permission">
+        select DISTINCT tp.* from t_role_permission trp
+            RIGHT JOIN t_permission tp on trp.permissionid = tp.id where trp.roleid in
+                <foreach collection="ids" item="roleid" open="(" close=")" separator=",">
+                    #{roleid}
+                </foreach>
+    </select>
+
+
+</mapper>

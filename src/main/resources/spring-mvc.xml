@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:component-scan base-package="com.example.controller"></context:component-scan>
+
+
+    <!--视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+
+    <!--视图控制器-->
+    <mvc:view-controller path="/" view-name="login"></mvc:view-controller><!--默认欢迎界面-->
+    <mvc:annotation-driven/>  <!--显示开启springMVC注解支持-->
+
+    <!--静态资源处理  两种方式-->
+<!--    <mvc:resources mapping="/static/**" location="/static/"></mvc:resources>-->
+    <!--<mvc:default-servlet-handler></mvc:default-servlet-handler>
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/login"/>
+            <mvc:exclude-mapping path="/static/**"/>
+            <bean class="com.example.interceptor.LoginInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>-->
+
+    <!-- 配置基于apache fileupload的通用文件上传器（注意：id属性不可省略） -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> <!-- 指定文件上传编码 -->
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+    <!-- 指定使用Cglib作为AOP的动态代理实现 -->
+    <aop:config proxy-target-class="true"/>
+    <!-- 开启Shiro权限注解支持 -->
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+</beans>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+        <!--配置自定义的Realm-->
+    <bean id="myRealm" class="com.example.realm.MyRealm">
+        <property name="cachingEnabled" value="true"/>  <!-- 启用缓存 -->
+        <property name="authenticationCachingEnabled" value="true"/> <!-- 启动认证缓存 -->
+        <property name="authenticationCacheName" value="authenticationCache"/> <!-- 对应在ehcache.xml中的cache name -->
+        <property name="authorizationCachingEnabled" value="true"/> <!-- 启用授权缓存 -->
+        <property name="authorizationCacheName" value="authorizationCache"/>
+    </bean>
+    <!-- 会话Cookie模板 -->
+    <bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <constructor-arg value="sid"/>
+        <property name="httpOnly" value="true"/>
+        <property name="maxAge" value="20000"/>
+    </bean>
+    <bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <constructor-arg value="rememberMe"/>
+        <property name="httpOnly" value="true"/>
+        <property name="maxAge" value="2592000"/><!-- 30天 -->
+    </bean>
+    <!-- rememberMe管理器 -->
+    <bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+        <property name="cookie" ref="rememberMeCookie"/>
+    </bean>
+    <!-- 配置会话管理器 -->
+        <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+            <property name="globalSessionTimeout" value="20000"></property>
+            <!--缓存-->
+            <property name="sessionDAO" ref="sessionDAO"/>
+            <!-- 指定Session监听器 -->
+            <property name="sessionListeners">
+                <list>
+                    <bean class="com.example.listener.MySessionListener" />
+                </list>
+            </property>
+
+        </bean>
+
+         <!-- 配置安全管理器-->
+        <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+            <!--注入自定义的Realm-->
+            <property name="realm" ref="myRealm"/>
+            <property name="sessionManager" ref="sessionManager"></property>
+            <property name="cacheManager" ref="cacheManager" />
+            <property name="rememberMeManager" ref="rememberMeManager"/>
+        </bean>
+
+    <!-- 配置缓存管理器 -->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile" value="classpath:/ehcache.xml" />
+    </bean>
+
+    <!-- 指定SessionDAO为EnterpriseCacheSessionDAO -->
+    <bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+        <!-- shiro默认会去ehcache.xml中找名字为shiro-activeSessionCache的缓存， 可以通过下面属性指定为其他缓存名称 -->
+        <property name="activeSessionsCacheName" value="shiro-activeSessionCache" />
+    </bean>
+
+
+
+        <!-- 配置 Shiro Filter -->
+        <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+            <!-- 安全管理器 -->
+            <property name="securityManager" ref="securityManager"/>
+            <!-- 默认的登陆访问url -->
+            <property name="loginUrl" value="/login.jsp"/>
+            <!-- 登陆成功后跳转的url -->
+<!--            <property name="successUrl" value="/index"/>-->
+            <!-- 没有权限跳转的url -->
+            <property name="unauthorizedUrl" value="/unauth.jsp"/>
+            <property name="filterChainDefinitions">
+                <value>
+                    <!--
+                    anon 不需要认证
+                    authc 需要认证
+                    user 认证通过或RememberMe登录的都可以
+                     /** 要放在最后
+                    -->
+                    /static/** = anon
+                    /login = anon
+                    /putong.jsp = roles[putong]
+                    /niubi.jsp = roles[niubi]
+                    /all.jsp = roles["putong","niubi"]
+                    /nine.jsp = perms[system:serman:kind:]
+                    /** = user
+                </value>
+            </property>
+        </bean>
+
+
+    <!--mybatis 配置-->
+    <context:component-scan base-package="com.example.service,com.example.mapper"></context:component-scan>
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/rbac?useUnicode=true&amp;characterEncoding=utf-8"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="wangfei.*0928"></property>
+    </bean>
+
+    <!--<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--必要属性 注入数据源 -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 可选属性 指定mybatis实体类别名，mybatis核心配置文件中大部分属性都支持直接在 SqlSessionFactoryBean上配置。 -->
+        <property name="typeAliasesPackage" value="com.example.bean" />
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+        <property name="configurationProperties">
+            <props>
+                <prop key="mapUnderscoreToCamelCase">true</prop>
+            </props>
+        </property>
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor"></bean>
+            </array>
+        </property>
+        <!--整合mybatis配置文件 但是这个配置文件不是必须的了-->
+        <!--<property name="configLocation" value="classpath:mybatis-config.xml" />-->
+    </bean>
+    <context:component-scan base-package="com.example.service" />
+    <mybatis:scan base-package="com.example.mapper" />
+
+    <!--配置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <aop:config>
+        <aop:pointcut id="myPointCut" expression="execution(* com.example.service.impl.*.*(..))"/>
+        <aop:advisor advice-ref="mytx" pointcut-ref="myPointCut"></aop:advisor>
+    </aop:config>
+
+    <tx:advice id="mytx" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="get*" propagation="SUPPORTS"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="del*" propagation="REQUIRED"/>
+            <tx:method name="do*" propagation="REQUIRED"/>
+            <tx:method name="*" propagation="SUPPORTS"/> <!--兜底-->
+        </tx:attributes>
+    </tx:advice>
+</beans>
